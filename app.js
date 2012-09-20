@@ -59,6 +59,7 @@ app.directive('choice', function($compile) {
     };
     scope.choiceClicked = function(choice) {
       choice.checked = !choice.checked;
+      //if(scope.singleselect === true) choice.checked = true; //WTF, how to get always select with singleselect?
       var choiceorig = choice.checked;
       function unselectAll(c) {
         choice.checked = false;
@@ -82,8 +83,7 @@ app.directive('choice', function($compile) {
           choice.checked = choiceorig;
         }
         checkChildren(choice);
-      }
-      if(scope.singleselect === true && !scope.withchildren === true) {
+      } else if(scope.singleselect === true) {
         unselectAll(choice);
         choice.checked = choiceorig;
       }
