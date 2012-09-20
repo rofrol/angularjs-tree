@@ -1,4 +1,4 @@
-var app = angular.module('plunker', []);
+var app = angular.module('plunker', ['ui']);
 
 function Choice(name, children) {
   this.name = name;
@@ -17,6 +17,7 @@ var boats = new Choice('Boats');
 
 app.controller('MainCtrl', function($scope) {
   $scope.name = 'World';
+  
   $scope.myTree = [apparel, boats];
 });
 
@@ -29,43 +30,74 @@ app.directive('choiceTree', function() {
         scope: {
           tree: '=ngModel',
           withchildren: '=withchildren'
+        },
+        compile: function compile(tElement, tAttrs, transclude) {
+          return {
+            pre: function preLink(scope, iElement, iAttrs, controller) {},
+            post: function postLink(scope, iElement, iAttrs, controller) {
+              console.log(scope);
+              scope.choiceClass = function(choice){
+                  return choice.show?"ui-show":"ui-hide";
+              };
+            }
+          };
         }
       };
 });
 
 app.directive('choice', function($compile) {
+  var link = function(scope, elm, attrs) {
+    scope.nodeicon = function(nr){
+        var c;
+        if(nr>0){
+          c = "dynatree-expander";
+          // http://plunker.no.de/edit?live=preview
+        } else {
+          c = "dynatree-connector";
+        }
+        
+        return c;
+    };
+    scope.choiceClicked = function(choice) {
+      choice.checked = !choice.checked;
+      function checkChildren(c) {
+        angular.forEach(c.children, function(c) {
+          c.checked = choice.checked;
+          checkChildren(c);
+        });
+      }
+      console.log(scope.withchildren);
+      if(scope.withchildren === true) checkChildren(choice);
+    };
+    scope.choiceShowHide = function(choice){
+      choice.show = !choice.show;
+      
+    };
+
+    //Add children by $compiling and doing a new choice directive
+    if (scope.choice.children.length > 0) {
+      var childChoice = $compile('<choice-tree ng-model="choice.children" withchildren="withchildren" ng-class="choiceClass($parent.choice)"></choice-tree>')(scope, function(clonedElement, scope) {
+        elm.find('li').append(clonedElement);
+      });
+    }
+  };
+
   return { 
     restrict: 'E',
     //In the template, we do the thing with the span so you can click the 
     //text or the checkbox itself to toggle the check
+    // http://jsfiddle.net/3N5y9/2/
     template: '<li>' +
-      '<span ng-click="choiceClicked(choice)">' +
-        '<input type="checkbox" ng-checked="choice.checked"> {{choice.name}}' +
-      '</span>' +
-    '</li>',
-    link: function(scope, elm, attrs) {
-      scope.choiceClicked = function(choice) {
-        choice.checked = !choice.checked;
-        function checkChildren(c) {
-          angular.forEach(c.children, function(c) {
-            c.checked = choice.checked;
-            checkChildren(c);
-          });
-        }
-        
-        if(scope.withchildren) checkChildren(choice);
-        attrs.$observe('tooltip', function(value) {
-          if (value) {
-            element.addClass('tooltip-title');
-          }
-        });
+      '<span ng-class="{\'dynatree-exp-edl\': choice.show}"><span ng-click="choiceShowHide(choice);" ng-class="nodeicon(choice.children.length)"></span>'+
+        '<input type="checkbox" ng-checked="choice.checked" ng-click="choiceClicked(choice)"> {{choice.name}}' +
+    '</span></li>',
+    transclude: true,
+    compile: function compile(tElement, tAttrs, transclude) {
+      return {
+        pre: function preLink(scope, iElement, iAttrs, controller) {},
+        post: link
       };
-      
-      //Add children by $compiling and doing a new choice directive
-      if (scope.choice.children.length > 0) {
-        var childChoice = $compile('<choice-tree ng-model="choice.children" withchildren="withchildren"></choice-tree>')(scope);
-        elm.append(childChoice);
-      }
     }
   };
 });
+

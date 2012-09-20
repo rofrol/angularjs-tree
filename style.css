@@ -1,6 +1,89 @@
-ul {
-    list-style: none;
+/* moje */
+
+.dynatree-container, .dynatree-container ul {
+  list-style: none;
+  margin-left:0; 
 }
-li {
-    margin-left: 20px;
+.dynatree-container ul {
+  margin-left: 16px;
 }
+
+ /*.ng-scope{border: 1px solid red;}*/
+
+/* http://stackoverflow.com/questions/3331353/transitions-on-the-display-property */
+.ui-show {
+  transition: all 0.5s ease;
+}
+.ui-hide {
+  /*height:0; wywala się zaznaczanie checkoboxa with children*/
+  opacity: 0;
+  transition: all 0.5s ease;
+}
+
+/*******************************************************************************
+ * Common icon definitions
+ */
+.dynatree-empty,
+.dynatree-vline,
+.dynatree-connector,
+.dynatree-expander,
+.dynatree-icon,
+.dynatree-checkbox,
+.dynatree-radio,
+.dynatree-drag-helper-img,
+#dynatree-drop-marker
+{
+  width: 16px;
+	height: 16px;
+/*	display: -moz-inline-box; /* @ FF 1+2 removed for issue 221 */
+/*	-moz-box-align: start; /* issue 221 */
+	display: inline-block; /* Required to make a span sizeable */
+	vertical-align: top;
+	background-repeat: no-repeat;
+	background-image: url("icons.gif");
+	background-position: 0 0;
+}
+
+/*******************************************************************************
+ * Expander icon
+ * Note: IE6 doesn't correctly evaluate multiples class names,
+ *  	 so we create combined class names that can be used in the CSS.
+ *
+ * Prefix: dynatree-exp-
+ * 1st character: 'e': expanded, 'c': collapsed
+ * 2nd character (optional): 'd': lazy (Delayed)
+ * 3rd character (optional): 'l': Last sibling
+ */
+
+.dynatree-expander
+{
+	background-position: 0 -80px;
+	cursor: pointer;
+}
+
+/*******************************************************************************
+ * Lines and connectors
+ */
+
+.dynatree-connector
+{
+  background-position: -16px -64px;
+}
+
+/*******************************************************************************
+ * Lines and connectors
+ */
+
+.dynatree-container, .dynatree-container ul {
+  background-repeat: repeat-y;
+	background-image: url("vline.png");
+  background-position: 5px 0px;
+}
+
+
+.dynatree-exp-el span.dynatree-expander,  /* Expanded, not delayed, last sibling */
+.dynatree-exp-edl span.dynatree-expander  /* Expanded, delayed, last sibling */
+{
+  background-position: -32px -96px;
+}
+
