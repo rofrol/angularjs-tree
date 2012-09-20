@@ -14,17 +14,9 @@
   <script src="app.js"></script>
 </head>
 <body ng-controller="MainCtrl">
- 
-    Hello {{name}}!
-  
-<p><a ng-click="showHide=!showHide">Toggle State: {{!!showHide}}</a></p>
-<div ui-show="showHide">Show</div>
-<div ui-hide="showHide">Hide</div>
-<div ui-toggle="showHide">Toggle</div>
-
 <input type="checkbox" ng-model="ch" />with children
 <input type="checkbox" ng-model="ss" />single select
-<choice-tree ng-model="myTree" withchildren="ch" class="dynatree-container"></choice-tree>
+<choice-tree ng-model="myTree" withchildren="ch" singleselect="ss" class="dynatree-container"></choice-tree>
 <hr />
 $scope.myTree = {{myTree | json}}
 

@@ -16,8 +16,6 @@ var apparel = new Choice('Apparel', [
 var boats = new Choice('Boats');
 
 app.controller('MainCtrl', function($scope) {
-  $scope.name = 'World';
-  
   $scope.myTree = [apparel, boats];
 });
 
@@ -29,7 +27,8 @@ app.directive('choiceTree', function() {
         restrict: 'E',
         scope: {
           tree: '=ngModel',
-          withchildren: '=withchildren'
+          withchildren: '=withchildren',
+          singleselect: '=singleselect'
         },
         compile: function compile(tElement, tAttrs, transclude) {
           return {
@@ -60,23 +59,42 @@ app.directive('choice', function($compile) {
     };
     scope.choiceClicked = function(choice) {
       choice.checked = !choice.checked;
+      var choiceorig = choice.checked;
+      function unselectAll(c) {
+        choice.checked = false;
+        var parent;
+        if(scope.$parent) parent = scope.$parent;
+        while(parent.$parent.tree || parent.$parent.choice) parent = parent.$parent;
+        angular.forEach(parent.tree, function(c) {
+          c.checked = false;
+          checkChildren(c);
+        });
+      }
       function checkChildren(c) {
         angular.forEach(c.children, function(c) {
           c.checked = choice.checked;
           checkChildren(c);
         });
       }
-      console.log(scope.withchildren);
-      if(scope.withchildren === true) checkChildren(choice);
+      if(scope.withchildren === true) {
+        if(scope.singleselect === true) {
+          unselectAll(choice);
+          choice.checked = choiceorig;
+        }
+        checkChildren(choice);
+      }
+      if(scope.singleselect === true && !scope.withchildren === true) {
+        unselectAll(choice);
+        choice.checked = choiceorig;
+      }
     };
     scope.choiceShowHide = function(choice){
       choice.show = !choice.show;
-      
     };
 
     //Add children by $compiling and doing a new choice directive
     if (scope.choice.children.length > 0) {
-      var childChoice = $compile('<choice-tree ng-model="choice.children" withchildren="withchildren" ng-class="choiceClass($parent.choice)"></choice-tree>')(scope, function(clonedElement, scope) {
+      var childChoice = $compile('<choice-tree ng-model="choice.children" withchildren="withchildren" singleselect="singleselect" ng-class="choiceClass($parent.choice)"></choice-tree>')(scope, function(clonedElement, scope) {
         elm.find('li').append(clonedElement);
       });
     }
