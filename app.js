@@ -1,4 +1,4 @@
-var app = angular.module('plunker', ['ui']);
+var app = angular.module('plunker', []);
 
 function Choice(name, children) {
   this.name = name;
